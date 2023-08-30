@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:homophone/chat/chatpage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +32,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
+  final _textField = TextEditingController();
   void _incrementCounter() {
     setState(() {
       _counter++;
@@ -48,12 +49,15 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Row(
           mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
                 width: 300,
                 child: TextField(
+                  controller: _textField,
                   decoration: InputDecoration(
-                    labelText: '请输入连接密钥!',
+                    hintText: '请输入连接密钥!',
+                    hintStyle: TextStyle(color: Colors.black, fontSize: 16),
                   ),
                 )),
             Container(
@@ -63,7 +67,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: () {
                     // 确认按钮的点击事件
                     // todo 获取输入框内容
-                    //
+                    var textFieldValue = _textField.text;
+                    print(textFieldValue);
+                    //todo 聊天页面
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                      return ChatScreen(secret: textFieldValue);
+                    }));
+
                   },
                 )),
           ],
@@ -72,8 +82,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  //跳转聊天页面,
-
-
-
+//跳转聊天页面,
 }
