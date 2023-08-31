@@ -3,9 +3,14 @@ import 'package:homophone/chat/data.dart';
 import 'package:homophone/chat/theme.dart';
 import 'package:flutter/material.dart';
 
+import 'model.dart';
+
 class ChatScreen extends StatefulWidget {
   final String secret;
-  const ChatScreen({Key? key,required this.secret}) : super(key: key);
+  final ServerInfo localInfo ;
+  const ChatScreen({Key? key,required this.secret,required this.localInfo}) : super(key: key);
+
+  //
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -14,6 +19,13 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   AppTheme theme = LightTheme();
   bool isDarkTheme = false;
+  //本机地址
+
+  //其他主机地址
+  late final List<ServerInfo> services;
+
+  //
+
   final currentUser = ChatUser(
     id: '1',
     name: 'Flutter',
@@ -255,6 +267,7 @@ class _ChatScreenState extends State<ChatScreen> {
       MessageType messageType,
       ) {
     final id = int.parse(Data.messageList.last.id) + 1;
+    //todo,发送数据资源
     _chatController.addMessage(
       Message(
         id: id.toString(),

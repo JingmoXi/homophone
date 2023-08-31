@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:homophone/chat/chatpage.dart';
 import 'dart:ffi' as ffi ;
 import 'package:homophone/generated_bindings.dart' ;
-
+import 'package:homophone/chat/model.dart' ;
 typedef HelloWorld= void  Function();
 typedef hello_world_func = ffi.Void Function();
 void main() {
@@ -91,8 +91,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     var textFieldValue = _textField.text;
                     print(textFieldValue);
                     //todo 聊天页面
+                    //
                     Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-                      return ChatScreen(secret: textFieldValue);
+                      ServerInfo localInfo=ServerInfo(addr: '', name: '');
+                      return ChatScreen(secret: textFieldValue,localInfo: localInfo);
                     }));
                   },
                 )),

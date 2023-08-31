@@ -14,10 +14,27 @@ pub extern "C" fn hello_world() {
     println!("hello world!")
 }
 
-//创建网络
+//进入网络
 #[no_mangle]
 pub extern "C" fn create_vnt(secret: *const c_char,name: *const c_char,server: *const c_char) {
     //todo 创建服务地址
     println!("hello world!")
+}
+
+//todo 查询网络服务列表
+#[no_mangle]
+pub extern "C" fn server_list()-> *mut c_char {
+    CString::new(String::from("hello") ).unwrap().into_raw()
+}
+
+//todo 退出网络
+#[no_mangle]
+pub extern "C" fn stop() {
+    println!("hello world!")
+}
+//todo 查询本机ip地址
+#[no_mangle]
+pub extern "C" fn local_ip()-> *mut c_char {
+    CString::new(String::from("hello") ).unwrap().into_raw()
 }
 
