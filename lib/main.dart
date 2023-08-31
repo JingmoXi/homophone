@@ -1,8 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:homophone/chat/chatpage.dart';
+import 'dart:ffi' as ffi ;
+import 'package:homophone/generated_bindings.dart' ;
 
+typedef HelloWorld= void  Function();
+typedef hello_world_func = ffi.Void Function();
 void main() {
-  runApp(const MyApp());
+  // final dylib = ffi.DynamicLibrary.open("native.dll");
+  // final HelloWorld hello = dylib
+  //     .lookup<ffi.NativeFunction<hello_world_func>>('hello_world')
+  //     .asFunction();
+  // hello();
+  final ffifunc= FlutterRustBindings(ffi.DynamicLibrary.open("native.dll"));
+
+  ffifunc.hello_world();
+
+  // final pointer = ffi.Pointer<ffi.Char>.cast(ffi.Pointer<ffi.Int8>.allocate(10));
+  // // 将字符串赋值给指针
+  // pointer.write('hello, world');
+  // // 将字符串赋值给指针
+  // pointer.write('hello, world');
+  // var res=ffifunc.md5(ffi.<ffi.Pointer<ffi.Char>>('hello, world'));
+  //
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -33,6 +53,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   final _textField = TextEditingController();
+
   void _incrementCounter() {
     setState(() {
       _counter++;
@@ -73,7 +94,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.of(context).push(MaterialPageRoute(builder: (_) {
                       return ChatScreen(secret: textFieldValue);
                     }));
-
                   },
                 )),
           ],

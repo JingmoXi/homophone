@@ -1,3 +1,7 @@
+[workspace]
+members = ["vnt","common","vnt-cli","vnt-jni"]
+
+
 [package]
 name = "native"
 version = "0.1.0"
@@ -10,3 +14,15 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 md5 = "0.7.0"
+
+[profile.release]
+opt-level = 'z'
+debug = 0
+debug-assertions = false
+strip= "debuginfo"
+overflow-checks = true
+lto = true
+panic = 'abort'
+incremental = false
+codegen-units = 1
+rpath = false
