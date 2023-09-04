@@ -1,5 +1,5 @@
-[workspace]
-members = ["vnt","common","vnt-cli","vnt-jni"]
+#[workspace]
+#members = ["vnt","common","vnt-cli","vnt-jni"]
 
 
 [package]
@@ -14,6 +14,13 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 md5 = "0.7.0"
+vnt-cli = { path = "./vnt-cli" }
+vnt = { path = "./vnt" }
+vnt-jni = { path = "./vnt-jni" }
+common = { path = "./common" }
+#vnt = { git = "https://github.com/lbl8603/vnt", branch = "main" }
+#vnt-cli = { path = "D:\vnt-1.2.1\vnt-cli" }
+
 
 [profile.release]
 opt-level = 'z'

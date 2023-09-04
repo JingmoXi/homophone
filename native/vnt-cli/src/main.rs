@@ -218,6 +218,7 @@ fn main() {
     let runtime = tokio::runtime::Builder::new_multi_thread().enable_all().worker_threads(thread_num).build().unwrap();
     runtime.block_on(main0(config, !unused_cmd));
     std::process::exit(0);
+
 }
 
 async fn main0(config: Config, show_cmd: bool) {
