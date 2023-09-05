@@ -19,6 +19,7 @@ use vnt::handle::registration_handler::ReqEnum;
 mod command;
 mod console_out;
 mod root_check;
+mod cmd;
 
 pub fn app_home() -> io::Result<PathBuf> {
     let path = dirs::home_dir().ok_or(io::Error::new(io::ErrorKind::Other, "not home"))?.join(".vnt-cli");
@@ -28,200 +29,8 @@ pub fn app_home() -> io::Result<PathBuf> {
     Ok(path)
 }
 
-fn main() {
-    let _ = log4rs::init_file("log4rs.yaml", Default::default());
-    let args: Vec<String> = std::env::args().collect();
-    let program = args[0].clone();
-    let mut opts = Options::new();
-    opts.optopt("k", "", "组网标识", "<token>");
-    opts.optopt("n", "", "设备名称", "<name>");
-    opts.optopt("d", "", "设备标识", "<id>");
-    opts.optflag("c", "", "关闭交互式命令");
-    opts.optopt("s", "", "注册和中继服务器地址", "<server.dart>");
-    opts.optmulti("e", "", "stun服务器", "<stun-server.dart>");
-    opts.optflag("a", "", "使用tap模式");
-    opts.optmulti("i", "", "配置点对网(IP代理)入站时使用", "<in-ip>");
-    opts.optmulti("o", "", "配置点对网出站时使用", "<out-ip>");
-    opts.optopt("w", "", "客户端加密", "<password>");
-    opts.optflag("W", "", "服务端加密");
-    opts.optflag("m", "", "模拟组播");
-    opts.optopt("u", "", "自定义mtu(默认为1430)", "<mtu>");
-    opts.optflag("", "tcp", "tcp");
-    opts.optopt("", "ip", "指定虚拟ip", "<ip>");
-    opts.optflag("", "relay", "仅使用服务器转发");
-    opts.optopt("", "par", "任务并行度(必须为正整数)", "<parallel>");
-    opts.optopt("", "thread", "线程数(必须为正整数)", "<thread>");
-    opts.optopt("", "model", "加密模式", "<model>");
-    //"后台运行时,查看其他设备列表"
-    opts.optflag("", "list", "后台运行时,查看其他设备列表");
-    opts.optflag("", "all", "后台运行时,查看其他设备完整信息");
-    opts.optflag("", "info", "后台运行时,查看当前设备信息");
-    opts.optflag("", "route", "后台运行时,查看数据转发路径");
-    opts.optflag("", "stop", "停止后台运行");
-    opts.optflag("h", "help", "帮助");
-    let matches = match opts.parse(&args[1..]) {
-        Ok(m) => { m }
-        Err(f) => {
-            print_usage(&program, opts);
-            println!("{}", f.to_string());
-            return;
-        }
-    };
-    if matches.opt_present("h") || args.len() == 1 {
-        print_usage(&program, opts);
-        return;
-    }
-    if !root_check::is_app_elevated() {
-        println!("Please run it with administrator or root privileges");
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        sudo::escalate_if_needed().unwrap();
-        return;
-    }
-    if matches.opt_present("list") {
-        command::command(command::CommandEnum::List);
-        return;
-    } else if matches.opt_present("info") {
-        command::command(command::CommandEnum::Info);
-        return;
-    } else if matches.opt_present("stop") {
-        command::command(command::CommandEnum::Stop);
-        return;
-    } else if matches.opt_present("route") {
-        command::command(command::CommandEnum::Route);
-        return;
-    } else if matches.opt_present("all") {
-        command::command(command::CommandEnum::All);
-        return;
-    }
-    if !matches.opt_present("k") {
-        print_usage(&program, opts);
-        println!("parameter -k not found .");
-        return;
-    }
-    let tap = matches.opt_present("a");
-    let token: String = matches.opt_get("k").unwrap().unwrap();
-    let device_id = matches.opt_get_default("d", String::new()).unwrap();
-    let device_id = if device_id.is_empty() {
-        if let Some(id) = common::identifier::get_unique_identifier() {
-            id
-        } else {
-            let path_buf = app_home().unwrap().join("device-id");
-            if let Ok(id) = std::fs::read_to_string(path_buf.as_path()) {
-                id
-            } else {
-                let id = uuid::Uuid::new_v4().to_string();
-                let _ = std::fs::write(path_buf, &id);
-                id
-            }
-        }
-    } else {
-        device_id
-    };
-    if device_id.is_empty() {
-        print_usage(&program, opts);
-        println!("parameter -d not found .");
-        return;
-    }
-    let name = matches.opt_get_default("n", os_info::get().to_string()).unwrap();
-    let server_address_str = matches.opt_get_default("s", "nat1.wherewego.top:29872".to_string()).unwrap();
-    let server_address = match server_address_str.to_socket_addrs() {
-        Ok(mut addr) => {
-            if let Some(addr) = addr.next() {
-                addr
-            } else {
-                println!("parameter -s error .");
-                return;
-            }
-        }
-        Err(e) => {
-            println!("parameter -s error {}.", e);
-            return;
-        }
-    };
-    let mut stun_server = matches.opt_strs("e");
-    if stun_server.is_empty() {
-        stun_server.push("stun1.l.google.com:19302".to_string());
-        stun_server.push("stun2.l.google.com:19302".to_string());
-        stun_server.push("stun.qq.com:3478".to_string());
-    }
 
-    let in_ip = matches.opt_strs("i");
-    let in_ip = match ips_parse(&in_ip) {
-        Ok(in_ip) => { in_ip }
-        Err(e) => {
-            print_usage(&program, opts);
-            println!();
-            println!("-i {}", e);
-            println!("example: -i 192.168.0.0/24,10.26.0.3");
-            return;
-        }
-    };
-    let out_ip = matches.opt_strs("o");
-    let out_ip = match out_ips_parse(&out_ip) {
-        Ok(out_ip) => { out_ip }
-        Err(e) => {
-            print_usage(&program, opts);
-            println!();
-            println!("-o {}", e);
-            println!("example: -o 0.0.0.0/0");
-            return;
-        }
-    };
-    let password: Option<String> = matches.opt_get("w").unwrap();
-    let server_encrypt = matches.opt_present("W");
-    let simulate_multicast = matches.opt_present("m");
-    let unused_cmd = matches.opt_present("c");
-    let mtu: Option<String> = matches.opt_get("u").unwrap();
-    let mtu = if let Some(mtu) = mtu {
-        match u16::from_str(&mtu) {
-            Ok(mtu) => {
-                Some(mtu)
-            }
-            Err(e) => {
-                print_usage(&program, opts);
-                println!();
-                println!("-u {}", e);
-                return;
-            }
-        }
-    } else {
-        None
-    };
-    let virtual_ip: Option<String> = matches.opt_get("ip").unwrap();
-    let virtual_ip = virtual_ip.map(|v| Ipv4Addr::from_str(&v).expect("--ip error"));
-    if let Some(virtual_ip) = virtual_ip {
-        if virtual_ip.is_unspecified() || virtual_ip.is_broadcast() || virtual_ip.is_multicast() {
-            println!("--ip invalid");
-            return;
-        }
-    }
-    let tcp_channel = matches.opt_present("tcp");
-    let relay = matches.opt_present("relay");
-    let parallel = matches.opt_get::<usize>("par").unwrap().unwrap_or(1);
-    if parallel == 0 {
-        println!("--par invalid");
-        return;
-    }
-    let thread_num = matches.opt_get::<usize>("thread").unwrap().unwrap_or(std::thread::available_parallelism().unwrap().get() * 2);
-    let cipher_model = matches.opt_get::<CipherModel>("model").unwrap().unwrap_or(CipherModel::AesGcm);
-    if thread_num == 0 {
-        println!("--thread invalid");
-        return;
-    }
-    println!("version {}",vnt::VNT_VERSION);
-    let config = Config::new(tap,
-                             token, device_id, name,
-                             server_address, server_address_str,
-                             stun_server, in_ip,
-                             out_ip, password, simulate_multicast, mtu,
-                             tcp_channel, virtual_ip, relay, server_encrypt, parallel, cipher_model);
-    let runtime = tokio::runtime::Builder::new_multi_thread().enable_all().worker_threads(thread_num).build().unwrap();
-    runtime.block_on(main0(config, !unused_cmd));
-    std::process::exit(0);
-
-}
-
-async fn main0(config: Config, show_cmd: bool) {
+pub async fn main0(config: Config, show_cmd: bool) {
     let server_encrypt = config.server_encrypt;
     let mut vnt_util = VntUtil::new(config).await.unwrap();
     let mut conn_count = 0;
@@ -491,4 +300,5 @@ fn green(str: String) -> impl std::fmt::Display {
 fn yellow(str: String) -> impl std::fmt::Display {
     style(str).yellow()
 }
+
 

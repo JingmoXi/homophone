@@ -55,20 +55,20 @@ fn new_sync(env: &mut JNIEnv, config: JObject) -> Result<VntUtilSync, Error> {
     let name = to_string_not_null(env, &config, "name")?;
     let device_id = to_string_not_null(env, &config, "deviceId")?;
     let password = to_string(env, &config, "password")?;
-    let server_address_str = to_string_not_null(env, &config, "server")?;
+    let server_address_str = to_string_not_null(env, &config, "server.dart")?;
     // let nat_test_server = to_string_not_null(env, &config, "natTestServer")?;
     let server_address = match server_address_str.to_socket_addrs() {
         Ok(mut rs) => {
             if let Some(addr) = rs.next() {
                 addr
             } else {
-                env.throw_new("Ljava/lang/RuntimeException", "server address err")
+                env.throw_new("Ljava/lang/RuntimeException", "server.dart address err")
                     .expect("throw");
                 return Err(Error::JavaException);
             }
         }
         Err(e) => {
-            env.throw_new("Ljava/lang/RuntimeException", format!("server address {}", e))
+            env.throw_new("Ljava/lang/RuntimeException", format!("server.dart address {}", e))
                 .expect("throw");
             return Err(Error::JavaException);
         }

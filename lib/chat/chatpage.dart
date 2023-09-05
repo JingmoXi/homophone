@@ -62,6 +62,11 @@ class _ChatScreenState extends State<ChatScreen> {
     _chatController.setTypingIndicator = !_chatController.showTypingIndicator;
   }
 
+  void syncServerList(){
+    //定时同步远端服务ip地址
+    //
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

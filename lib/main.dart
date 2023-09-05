@@ -3,6 +3,9 @@ import 'package:homophone/chat/chatpage.dart';
 import 'dart:ffi' as ffi ;
 import 'package:homophone/generated_bindings.dart' ;
 import 'package:homophone/chat/model.dart' ;
+import 'package:homophone/vnt.dart';
+import 'package:homophone/common/util.dart';
+
 typedef HelloWorld= void  Function();
 typedef hello_world_func = ffi.Void Function();
 void main() {
@@ -23,7 +26,7 @@ void main() {
   // var res=ffifunc.md5(ffi.<ffi.Pointer<ffi.Char>>('hello, world'));
   //
   //
-  // runApp(const MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -52,14 +55,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  final _textField = TextEditingController();
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  final _textField = TextEditingController();
+  String name=GetMathicneName();
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,13 +87,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text('确认'),
                   onPressed: () {
                     // 确认按钮的点击事件
-                    // todo 获取输入框内容
+                    // 获取输入框内容
                     var textFieldValue = _textField.text;
                     print(textFieldValue);
-                    //todo 聊天页面
-                    //
+                    //todo 启动vnt,获取本地ip,信息
+                    JoinVnt(textFieldValue, this.name, "");
                     Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-                      ServerInfo localInfo=ServerInfo(addr: '', name: '');
+                      ServerInfo localInfo=ServerInfo(addr: LocalVirsualIp(), name: GetLocalIp());
                       return ChatScreen(secret: textFieldValue,localInfo: localInfo);
                     }));
                   },

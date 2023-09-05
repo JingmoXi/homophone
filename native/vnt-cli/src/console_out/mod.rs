@@ -11,7 +11,7 @@ pub fn console_info(status: Info) {
     println!("Virtual netmask: {}", style(status.virtual_netmask).green());
     println!("Connection status: {}", style(status.connect_status).green());
     println!("NAT type: {}", style(status.nat_type).green());
-    println!("Relay server: {}", style(status.relay_server).green());
+    println!("Relay server.dart: {}", style(status.relay_server).green());
     println!("Public ips: {}", style(status.public_ips).green());
     println!("Local ip: {}", style(status.local_ip).green());
 }

@@ -20,6 +20,26 @@ class FlutterRustBindings {
           lookup)
       : _lookup = lookup;
 
+  void create_vnt(
+    ffi.Pointer<ffi.Char> secret,
+    ffi.Pointer<ffi.Char> name,
+    ffi.Pointer<ffi.Char> server,
+  ) {
+    return _create_vnt(
+      secret,
+      name,
+      server,
+    );
+  }
+
+  late final _create_vntPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>)>>('create_vnt');
+  late final _create_vnt = _create_vntPtr.asFunction<
+      void Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Char>)>();
+
   void hello_world() {
     return _hello_world();
   }
@@ -27,6 +47,15 @@ class FlutterRustBindings {
   late final _hello_worldPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function()>>('hello_world');
   late final _hello_world = _hello_worldPtr.asFunction<void Function()>();
+
+  ffi.Pointer<ffi.Char> local_ip() {
+    return _local_ip();
+  }
+
+  late final _local_ipPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('local_ip');
+  late final _local_ip =
+      _local_ipPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
   ffi.Pointer<ffi.Char> md5(
     ffi.Pointer<ffi.Char> data,
@@ -41,4 +70,22 @@ class FlutterRustBindings {
           ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>>('md5');
   late final _md5 = _md5Ptr
       .asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>();
+
+  ffi.Pointer<ffi.Char> server_list() {
+    return _server_list();
+  }
+
+  late final _server_listPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>(
+          'server_list');
+  late final _server_list =
+      _server_listPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
+
+  void stop() {
+    return _stop();
+  }
+
+  late final _stopPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function()>>('stop');
+  late final _stop = _stopPtr.asFunction<void Function()>();
 }

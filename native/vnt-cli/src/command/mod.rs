@@ -92,7 +92,7 @@ pub fn command_list(vnt: &Vnt) -> Vec<DeviceItem> {
             let nat_traversal_type = if route.metric == 1 {
                 "p2p"
             } else if route.addr == info.connect_server {
-                "server-relay"
+                "server.dart-relay"
             } else {
                 "client-relay"
             }.to_string();
