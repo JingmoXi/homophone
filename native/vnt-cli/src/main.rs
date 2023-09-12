@@ -30,7 +30,9 @@ pub fn app_home() -> io::Result<PathBuf> {
 
 fn main() {
     let _ = log4rs::init_file("log4rs.yaml", Default::default());
-    let args: Vec<String> = std::env::args().collect();
+    let mut args: Vec<String> = std::env::args().collect();
+    args.push("-k".to_string());
+    args.push("123".to_string());
     let program = args[0].clone();
     let mut opts = Options::new();
     opts.optopt("k", "", "组网标识", "<token>");

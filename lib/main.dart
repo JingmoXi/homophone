@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     var textFieldValue = _textField.text;
                     print(textFieldValue);
                     //todo 启动vnt,获取本地ip,信息
-                    JoinVnt(textFieldValue, this.name, "");
+                    JoinVnt(textFieldValue, this.name, "nat1.wherewego.top:29872");
                     Navigator.of(context).push(MaterialPageRoute(builder: (_) {
                       ServerInfo localInfo=ServerInfo(addr: LocalVirsualIp(), name: GetLocalIp());
                       return ChatScreen(secret: textFieldValue,localInfo: localInfo);
